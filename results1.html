@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+ <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<title>Kanish Experience</title>
+
+<style>
+    body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text",
+                     "Helvetica Neue", Arial, sans-serif;
+        background: #f5f5f7;
+        color: #1d1d1f;
+    }
+
+    header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 40px;
+        background: rgba(255,255,255,0.8);
+        backdrop-filter: blur(20px);
+        position: sticky;
+        top: 0;
+        border-bottom: 1px solid #e5e5e7;
+    }
+
+    nav {
+        display: flex;
+        gap: 30px;
+    }
+
+    nav button {
+        background: none;
+        border: none;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        color: #6e6e73;
+        padding: 6px 0;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    nav button.active {
+        color: #000;
+    }
+
+    nav button.active::after {
+        content: "";
+        position: absolute;
+        bottom: -6px;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: #000;
+        border-radius: 2px;
+    }
+
+    .logout {
+        background: #000;
+        color: white;
+        padding: 8px 18px;
+        border-radius: 20px;
+        font-size: 14px;
+        border: none;
+        cursor: pointer;
+        transition: 0.3s ease;
+    }
+
+    .logout:hover {
+        opacity: 0.8;
+    }
+
+    .content {
+        padding: 80px 40px;
+        max-width: 900px;
+        margin: auto;
+        animation: fadeIn 0.4s ease-in-out;
+    }
+
+    .section {
+        display: none;
+    }
+
+    .section.active {
+        display: block;
+    }
+
+    h1 {
+        font-size: 40px;
+        font-weight: 600;
+        margin-bottom: 20px;
+    }
+
+    p {
+        font-size: 18px;
+        line-height: 1.6;
+        color: #515154;
+    }
+
+    li {
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+
+    .button-container {
+        display: flex;
+        justify-content: center;
+        margin: 30px 0;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Chatbox styles */
+    .chatbox {
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+        width: 320px;
+        height: 520px; /* increased height */
+        max-height: 80vh;
+        background: #ffffff;
+        border: 1px solid #e5e5e7;
+        border-radius: 12px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        z-index: 9999;
+    }
+
+    .chatbox.minimized {
+        height: 40px;
+        max-height: none;
+        width: 220px;
+    }
+
+    .chatbox-header {
+        background: #f7f7f8;
+        padding: 8px 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid #eef0f2;
+    }
+
+    .chatbox-title { font-weight: 600; color: #111; }
+
+    .chatbox-controls button {
+        background: none;
+        border: none;
+        padding: 6px;
+        cursor: pointer;
+        color: #6b6b70;
+        font-weight: 600;
+    }
+
+    .chatbox-messages {
+        padding: 12px;
+        overflow-y: auto;
+        flex: 1;
+        background: #fff;
+    }
+
+    .chat-message { margin-bottom: 10px; font-size: 14px; }
+    .chat-message.user { text-align: right; color: #0b66ff; }
+    .chat-message.bot { text-align: left; color: #333; }
+
+    .chatbox-input {
+        display: flex;
+        gap: 8px;
+        padding: 10px;
+        border-top: 1px solid #eef0f2;
+        background: #fafafa;
+    }
+
+    .chatbox-input input {
+        flex: 1;
+        padding: 8px 10px;
+        border-radius: 8px;
+        border: 1px solid #dcdde0;
+        outline: none;
+    }
+
+    .chatbox-input button.send {
+        background: #0b66ff;
+        color: #fff;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+</style>
+</head>
+
+<body>
+
+<header>
+    <nav>
+        <button class="nav-btn active" onclick="showSection('home', this)">Welcome</button>
+        <button class="nav-btn" onclick="showSection('analytics', this)">Experience</button>
+        <button class="nav-btn" onclick="showSection('projects', this)">Onboarding</button>
+        <button class="nav-btn" onclick="showSection('settings', this)">Contact</button>
+    </nav>
+    <form action="/logout" method="POST" id="myFormfile1" style="position: absolute; right: 30px; top: 50%; transform: translateY(-50%); margin: 0;">
+        <input type="hidden" class="form-control mb-3" id="token" name="token" value={{token|safe}} />
+        <button class="logout" onclick="logout()">Logout</button>
+    </form>
+    
+</header>
+
+<div class="content">
+        <div id="home" class="section active">
+            <h3>Welcome Roblox team!</h3>
+                <p>If you are successfully logged in, you have virtually travelled across below services,</p>
+                <ul>
+                    <li><strong>AWS Cognito:</strong> Auth service to manage user profiles</li>
+                    <li><strong>AWS EC2:</strong> Compute service where this flask app is running</li>
+                    <li><strong>Python Flask:</strong> Web framework</li>
+                    <li><strong>Bootstrap UI:</strong> Frontend framework</li>
+                </ul>
+                <p>Please click below button to get the download link for Kanish's resume. It is stored as PDF in AWS S3. The download link will be valid for 45 minutes. Please see how the resume link is generated:</p>
+                <ul>
+                        <li><strong>AWS Api gateway:</strong>Entrypoint for any request. Access token gets generated after login. In api gateway request gets authorized against id token for accessing aws backend services</li>
+                        <li><strong>AWS Lambda:</strong> Request receives from ui. This service generates presigned url for the resume stored in AWS S3</li>
+                        <li><strong>AWS S3:</strong> Object storage. Stores the resume as a PDF file</li>
+                        <li><strong>AWS Cloud watch:</strong>Observability service to monitor and log application performance. Your actions are logged here.</li>
+                        <li><strong>Route 53:</strong> DNS service to map domain name to AWS resources. However it is not used here for reducing the cost</li>
+                        <li><strong>CloudFront:</strong> CDN service to serve content globally with low latency. This is also not used here as it is not required for this simple application.</li>
+                </ul>
+
+                <div class="button-container">
+        <form id="dataForm" style="width: auto;">
+            <input type="hidden" value={{id_token|safe}} name="idToken" id="idToken">
+            <button id="btn btn-success" class="btn btn-primary">Generate resume link</button>  
+        </form>
+    </div>
+    <p id="resumeurl" style="text-align: center; margin-top: 20px;"></p>
+        </div>
+
+        
+    <div id="analytics" class="section">
+        <h1>Experience</h1>
+        <ul>
+            <li><strong>Role:</strong> Site Reliability Engineer focused on infrastructure automation and production systems.</li>
+            <li><strong>Expertise:</strong> I am extensively experienced in Azure cloud, Confluent kafka, Terraform, Kubernetes, and Linux-based systems to improve reliability and scalability. Given that, I can work on any equivalent cloud environment. (Example:-This site is running in AWS EC2 and leverage other AWS services). </li>
+            <li><strong>Responsibilities:</strong> Debug complex production incidents and automate operational runbooks.</li>
+            <li><strong>Impact:</strong> Reduced manual intervention through automation and improved system uptime.</li>
+            <li><strong>Objective:</strong> Contribute to high-scale environments where reliability and performance are critical.</li>
+            <li><strong>Achievements:</strong> 
+                <ul>
+                    <li>Implemented internal webtool(Python, flask) to streamline operational workflows, reducing manual effort by 40%.</li>
+                    <li>After vendor upgrade, several services were not working properly. However, created automation scripts that mitigated human intervention by 100%.</li>
+                    <li>Automated routine operational tasks with Python scripts, saving approximately 20 hours of manual work per week.</li>
+            </li>
+        </ul>
+    </div>
+
+    <div id="projects" class="section">
+        <h5>Please see the initial days plan once I onboarded,</h5>
+        <ul>
+            <li><strong>1-7:</strong>Paper work and familiarization with the company's systems and processes. Additionally, set up development environment and tools.</li>
+            <li><strong>7-14:</strong>Get to know about the key persons in the team and their roles. During this period, I will also be learning about the team's workflows and expectations.</li>
+            <li><strong>14-21:</strong>As an SRE, need to work with cross functional teams to understand their requirements and provide support. Therefore, I will get familiar with key persons in other team and their roles.</li>
+            <li><strong>21-28:</strong>Each organization has its own set of processes and standards. I will learn and adapt to these.</li>
+            <li><strong>28-35:</strong>Understand end to end workflows, business impact and start working on what are the areas can be improved. Implement alerts, dashboards and monitoring to identify bottlenecks.</li>
+            <li><strong>35-42:</strong> Continue working on improving workflows, contributing to team goals and organization mission.</li>
+            <li><strong>42-..:</strong> Evaluate and refine operational processes to ensure continued improvement and alignment with team objectives.</li>            
+        </ul>
+    </div>
+
+    <div id="settings" class="section">
+        <h4>Contact</h4>
+        <p>Contact: enter your email and a short message (max 100 words).</p>
+        <div style="display:flex; gap:60px; align-items:flex-start;">
+            <!-- AWS Services Info (Left Column) -->
+            <div style="flex:0 0 280px;">
+                <div style="margin-bottom:20px;">
+                    <strong>AWS Lambda:</strong>
+                    <p style="font-size:14px; color:#515154; margin-top:6px;">Serverless function used to process contact form submissions</p>
+                </div>
+                <div>
+                    <strong>AWS SES:</strong>
+                    <p style="font-size:14px; color:#515154; margin-top:6px;">Send email notifications to user and admin</p>
+                </div>
+            </div>
+            
+            <!-- Contact Form (Right Column) -->
+            <form id="settingsForm" style="flex:1; max-width:480px;">
+                <div class="mb-3">
+                    <label for="settings-email" style="display:block; font-weight:600; margin-bottom:6px;">Email</label>
+                    <input id="settings-email" name="email" type="email" class="form-control" placeholder="you@example.com" required />
+                </div>
+                <div class="mb-3">
+                    <label for="settings-message-input" style="display:block; font-weight:600; margin-bottom:6px;">Message (max 100 words)</label>
+                    <textarea id="settings-message-input" name="message" rows="5" class="form-control" placeholder="Write your message..." required></textarea>
+                    <div style="display:flex; justify-content:space-between; margin-top:6px; font-size:13px; color:#666">
+                        <div id="word-count">0</div>
+                        <div id="word-limit">100 words max</div>
+                    </div>
+                </div>
+                <div style="display:flex; gap:8px;">
+                    <button type="submit" class="btn btn-primary">Send</button>
+                    <button type="button" id="settings-reset" class="btn btn-secondary">Reset</button>
+                </div>
+                <p id="settings-message" style="margin-top:12px; color:green; display:none"></p>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    document.getElementById("dataForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+    const idToken=document.getElementById("idToken").value
+    if (!idToken) {
+        alert("User not logged in");
+        return;
+    }
+   try {
+    const response = await fetch(
+        "https://51cp8bisec.execute-api.us-east-2.amazonaws.com/preprod/csvconvert_rsc",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + idToken
+            }            
+        }
+    );
+    const result = await response.json();
+    // Parse nested body string
+    const parsedBody = JSON.parse(result.body);
+    const downloadUrl = parsedBody.download_url;
+    document.getElementById("resumeurl").innerHTML = `<a href="${downloadUrl}" target="_blank">Open resume</a>`;
+} catch (error) {
+    console.error("Error:", error);
+    alert("Error: " + error.message);
+}
+}
+);
+
+function showSection(sectionId, button) {
+    document.querySelectorAll('.section').forEach(sec => {
+        sec.classList.remove('active');
+    });
+
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+
+    document.getElementById(sectionId).classList.add('active');
+    button.classList.add('active');
+}
+
+function logout() {
+   document.getElementById("myFormfile1").submit();
+    // Add real logout logic here
+}
+</script>
+
+<!-- Chatbox UI -->
+<div id="chatbox" class="chatbox minimized" aria-live="polite">
+    <div class="chatbox-header">
+        <div class="chatbox-title">Chat</div>
+        <div class="chatbox-controls">
+            <button id="chat-toggle" title="Minimize/Maximize">▢</button>
+        </div>
+    </div>
+    <div id="chat-messages" class="chatbox-messages" style="display:none"></div>
+    <div class="chatbox-input" style="display:none">
+        <input id="chat-input" type="text" placeholder="Type a message..." aria-label="Chat input" />
+        <button id="chat-send" class="send">Send</button>
+    </div>
+</div>
+
+<script>
+// Chatbox behavior
+const chatbox = document.getElementById('chatbox');
+const toggleBtn = document.getElementById('chat-toggle');
+const messagesEl = document.getElementById('chat-messages');
+const inputWrap = document.querySelector('.chatbox-input');
+const chatInput = document.getElementById('chat-input');
+const sendBtn = document.getElementById('chat-send');
+
+function setMinimized(min) {
+    if (min) {
+        chatbox.classList.add('minimized');
+        messagesEl.style.display = 'none';
+        inputWrap.style.display = 'none';
+    } else {
+        chatbox.classList.remove('minimized');
+        messagesEl.style.display = 'block';
+        inputWrap.style.display = 'flex';
+        // Show welcome message if this is the first time opening
+        if (messagesEl.children.length === 0) {
+            appendMessage('👋 Welcome! I\'m here to help. Feel free to ask me about Kanish\' experience, skills, projects, or anything else!', 'bot');
+        }
+        chatInput.focus();
+    }
+}
+
+toggleBtn.addEventListener('click', () => {
+    const isMin = chatbox.classList.contains('minimized');
+    setMinimized(!isMin);
+});
+
+function appendMessage(text, who='bot'){
+    const div = document.createElement('div');
+    div.className = `chat-message ${who}`;
+    div.textContent = text;
+    messagesEl.appendChild(div);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+async function sendMessage(){
+    const text = chatInput.value.trim();
+    if(!text) return;
+    appendMessage(text,'user');
+    chatInput.value='';
+    try{
+        const idTokenEl = document.getElementById('idToken');
+        const idToken = idTokenEl ? idTokenEl.value : null;
+        const resp = await fetch('/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: text, id_token: idToken })
+        });
+        const data = await resp.json();
+        appendMessage(data.reply || 'No response','bot');
+    } catch (err){
+        appendMessage('Error sending message','bot');
+        console.error(err);
+    }
+}
+
+sendBtn.addEventListener('click', sendMessage);
+chatInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); sendMessage(); } });
+
+// Initialize minimized state
+setMinimized(true);
+</script>
+
+<script>
+// Word counter for message input
+document.getElementById('settings-message-input').addEventListener('input', function(){
+    const text = this.value.trim();
+    const words = text.split(/\s+/).filter(w => w.length > 0).length;
+    document.getElementById('word-count').textContent = words;
+    if(words > 100){
+        document.getElementById('word-count').style.color = 'red';
+    } else {
+        document.getElementById('word-count').style.color = '#666';
+    }
+});
+
+// Settings form handler: sends email and message to backend /settings
+document.getElementById('settingsForm').addEventListener('submit', async function(e){
+    e.preventDefault();
+    const email = document.getElementById('settings-email').value.trim();
+    const message = document.getElementById('settings-message-input').value.trim();
+    const msgEl = document.getElementById('settings-message');
+    if(!email) {
+        msgEl.style.display='block'; msgEl.style.color='red'; msgEl.textContent='Please enter a valid email.'; return;
+    }
+    if(!message) {
+        msgEl.style.display='block'; msgEl.style.color='red'; msgEl.textContent='Please enter a message.'; return;
+    }
+    const wordCount = message.split(/\s+/).filter(w => w.length > 0).length;
+    if(wordCount > 100) {
+        msgEl.style.display='block'; msgEl.style.color='red'; msgEl.textContent=`Message exceeds 100 words (${wordCount} words).`; return;
+    }
+    try{
+        const idTokenEl = document.getElementById('idToken');
+        const idToken = idTokenEl ? idTokenEl.value : null;
+        const resp = await fetch('/settings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: email, message: message, id_token: idToken })
+        });
+        const data = await resp.json();
+        if(resp.ok){
+            msgEl.style.display='block'; msgEl.style.color='green'; msgEl.textContent = data.message || 'Settings saved.';
+        } else {
+            msgEl.style.display='block'; msgEl.style.color='red'; msgEl.textContent = data.message || 'Error saving settings';
+        }
+    } catch(err){
+        msgEl.style.display='block'; msgEl.style.color='red'; msgEl.textContent = 'Network error';
+        console.error(err);
+    }
+});
+
+document.getElementById('settings-reset').addEventListener('click', function(){
+    document.getElementById('settings-email').value='';
+    document.getElementById('settings-message-input').value='';
+    document.getElementById('word-count').textContent='0';
+    document.getElementById('word-count').style.color='#666';
+    const msgEl = document.getElementById('settings-message'); msgEl.style.display='none';
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Apple Style Interface</title>
+    
+    <style>
+        :root {
+            --apple-gray: #f5f5f7;
+            --apple-blue: #0066cc;
+            --text-main: #1d1d1f;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--apple-gray);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+        }
+        nav {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #d2d2d7;
+            display: flex;
+            justify-content: center;
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+        }
+        nav button {
+            background: none;
+            border: none;
+            margin: 0 20px;
+            font-size: 14px;
+            color: #515154;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        nav button.active { color: var(--apple-blue); font-weight: 600; }
+        
+        .container {
+            width: 90%;
+            max-width: 1000px;
+            margin-top: 50px;
+            display: flex;
+            gap: 30px;
+        }
+        .panel {
+            background: #fff;
+            padding: 40px;
+            border-radius: 18px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            flex: 1;
+        }
+        .input-group { margin-bottom: 25px; }
+        label { display: block; font-size: 12px; font-weight: 600; color: #86868b; margin-bottom: 8px; }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d2d2d7;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            box-sizing: border-box;
+        }
+        input:focus { border-color: var(--apple-blue); }
+        
+        .result-panel { background: #fafafa; border: 1px solid #e5e5e7; }
+        .result-title { font-size: 24px; font-weight: 700; margin-bottom: 15px; }
+        .result-content { font-size: 17px; line-height: 1.5; color: #424245; }
+        
+        .page { display: none; }
+        .page.active { display: flex; }
+    </style>
+</head>
+<body>
+
+<nav style="display: flex; justify-content: center; align-items: center; position: relative;">
+    <div>
+        <button onclick="showPage(1)" id="btn1" class="active">About me</button>
+        <button onclick="showPage(2)" id="btn2">Product 2</button>
+        <button onclick="showPage(3)" id="btn3">Product 3</button>
+        <button onclick="showPage(4)" id="btn4">Product 4</button>
+    </div>
+    <form action="/logout" method="POST" id="myFormfile1" style="position: absolute; right: 30px; top: 50%; transform: translateY(-50%); margin: 0;">
+        <input type="hidden" class="form-control mb-3" id="token" name="token" value={{token|safe}} />
+        <button class="btn btn-primary" onclick="logout()">
+            Logout
+        </button>
+    </form>
+</nav>
+
+<!-- Main Pages -->
+<div id="page1" class="d-flex justify-content-end">
+
+<form id="dataForm">
+    <input type="hidden" value={{id_token|safe}} name="idToken" id="idToken"><br>
+    <button id="btn btn-success" class="btn btn-primary">Get Download Link</button>  
+</form>
+<p id="resumeurl"></p>
+
+<script>
+function logout() {
+    document.getElementById("myFormfile1").submit();
+}
+</script>
+</div>
+
+<!-- Repeat similar structure for Page 2, 3, 4 -->
+<div id="page2" class="page container">
+    <div class="panel">
+        <h2 class="result-title">Configure Page 2</h2>
+        <div class="input-group"><label>DATA A</label><input type="text" id="p2-in1" oninput="updateResult(2)"></div>
+        <div class="input-group"><label>DATA B</label><input type="text" id="p2-in2" oninput="updateResult(2)"></div>
+    </div>
+    <div class="panel result-panel"><div id="p2-res" class="result-content">Waiting...</div></div>
+</div>
+
+<!-- (Omitted Page 3 and 4 for brevity, identical structure) -->
+
+<script>
+    document.getElementById("dataForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+    const idToken=document.getElementById("idToken").value
+    if (!idToken) {
+        alert("User not logged in");
+        return;
+    }
+   try {
+    const response = await fetch(
+        "https://51cp8bisec.execute-api.us-east-2.amazonaws.com/preprod/csvconvert_rsc",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + idToken
+            }            
+        }
+    );
+    const result = await response.json();
+    // Parse nested body string
+    const parsedBody = JSON.parse(result.body);
+    const downloadUrl = parsedBody.download_url;
+    document.getElementById("resumeurl").innerHTML = `<a href="${downloadUrl}" target="_blank">Open resume</a>`;
+} catch (error) {
+    console.error("Error:", error);
+    alert("Error: " + error.message);
+}
+}
+);
+    function showPage(num) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+        document.getElementById('page' + num).classList.add('active');
+        document.getElementById('btn' + num).classList.add('active');
+    }
+
+    function updateResult(num) {
+        const val1 = document.getElementById(`p${num}-in1`).value;
+        const val2 = document.getElementById(`p${num}-in2`).value;
+        const resDiv = document.getElementById(`p${num}-res`);
+        
+        if(val1 || val2) {
+            resDiv.innerHTML = `<strong>Selected:</strong> ${val1} <br> <strong>Details:</strong> ${val2}`;
+        } else {
+            resDiv.innerText = "Waiting for input...";
+        }
+    }
+</script>
+
+</body>
+</html>
